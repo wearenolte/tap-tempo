@@ -1,0 +1,15 @@
+version: "3"
+services:
+
+  tap-tempo:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: tap-tempo
+    container_name: tap_tempo
+    volumes:
+      - ".:/tap-tempo"
+    command: tail -f /dev/null
+
+    working_dir: /tap-tempo/tap_tempo

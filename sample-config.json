@@ -1,0 +1,8 @@
+{
+  "oauth_client_secret": "<oauth-client-secret>",
+  "oauth_client_id": "<oauth-client-id>",
+  "access_token": "<access-token>",
+  "refresh_token": "<refresh-token>",
+  "start_date": "<i.e. 2017-12-04T19:19:32Z>",
+  "user_agent": "<user-agent>"
+}
