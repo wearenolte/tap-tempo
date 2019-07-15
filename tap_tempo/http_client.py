@@ -33,8 +33,6 @@ class Client:
         self.cloud_id = config.get('cloud_id')
         self.access_token = config.get('access_token')
         self.refresh_token = config.get('refresh_token')
-        self.oauth_client_id = config.get('oauth_client_id')
-        self.oauth_client_secret = config.get('oauth_client_secret')
         self.redirect_uri = config.get('redirect_uri')
 
         # Auth token lasts 60 days.
