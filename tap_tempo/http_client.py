@@ -51,7 +51,9 @@ class Client:
         headers['Authorization'] = 'Bearer {}'.format(self.access_token)
         return headers
 
-    def send(self, method, path, headers={}, **kwargs):
+    def send(self, method, path, headers=None, **kwargs):
+        if headers is None:
+            headers = {}
         request = requests.Request(method,
                                    path,
                                    headers=self._headers(headers),
