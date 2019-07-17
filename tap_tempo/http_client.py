@@ -29,7 +29,7 @@ class Client:
         self.login_timer = None
         self.base_url = 'https://api.tempo.io/core/3/{}'
         self.user_agent = config.get("user_agent")
-        self.access_token = 'zhFmM3MaVo6YZO3mUiHH8r1JWLmTVr'  # config.get('access_token')
+        self.access_token = config.get('access_token')
         self.refresh_token = config.get('refresh_token')
         self.client_id = config.get('client_id')
         self.client_secret = config.get('client_secret')
