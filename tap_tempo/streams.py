@@ -1,4 +1,6 @@
+import json
 
+import singer
 from singer import metrics, utils, metadata, Transformer
 from .context import Context
 
@@ -29,4 +31,18 @@ class Stream:
         self.write_page(page)
 
     def write_page(self, page):
-        print(page['results'][0])
+        stream = Context.get_catalog_entry(self.tap_stream_id)
+        extraction_time = singer.utils.now()
+        for rec in page['results']:
+            with Transformer() as transformer:
+                rec = transformer.transform(rec, stream.schema.to_dict())
+            singer.write_record(self.tap_stream_id, rec, time_extracted=extraction_time)
+        with metrics.record_counter(self.tap_stream_id) as counter:
+            counter.increment(len(page))
+
+
+ACCOUNTS = Stream('accounts', ['id'], path='accounts/')
+
+ALL_STREAMS = [
+    ACCOUNTS,
+]
