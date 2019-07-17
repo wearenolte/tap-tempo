@@ -27,7 +27,6 @@ class Client:
         self.session = requests.Session()
         self.next_request_at = datetime.now()
         self.login_timer = None
-        self.base_url = 'https://api.tempo.io/core/3/{}'
         self.user_agent = config.get("user_agent")
         self.access_token = config.get('access_token')
         self.refresh_token = config.get('refresh_token')
