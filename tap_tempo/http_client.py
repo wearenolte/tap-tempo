@@ -1,12 +1,8 @@
 from datetime import datetime, timedelta
 import time
-import threading
-import re
 import json
-from requests.exceptions import HTTPError
-from requests.auth import HTTPBasicAuth
 import requests
-from singer import utils
+from requests import HTTPError
 
 from singer import metrics
 import singer
@@ -20,6 +16,11 @@ class RateLimitException(Exception):
 LOGGER = singer.get_logger()
 # > 10ms can help avoid performance issues
 TIME_BETWEEN_REQUESTS = timedelta(microseconds=10e3)
+
+
+def should_retry_httperror(exception):
+    """ Retry 500-range errors. """
+    return 500 <= exception.response.status_code < 600
 
 
 class Client:
@@ -60,6 +61,15 @@ class Client:
                                    )
         return self.session.send(request.prepare())
 
+    @backoff.on_exception(backoff.expo,
+                          HTTPError,
+                          jitter=None,
+                          max_tries=6,
+                          giveup=lambda e: not should_retry_httperror(e))
+    @backoff.on_exception(backoff.constant,
+                          RateLimitException,
+                          max_tries=10,
+                          interval=60)
     def request(self, tap_stream_id, *args, **kwargs):
         wait = (self.next_request_at - datetime.now()).total_seconds()
         if wait > 0:
