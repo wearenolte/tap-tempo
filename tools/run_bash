@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# This script starts the development environment using Docker
+
+BASEDIR=$(dirname "$0")
+DOCKER_COMPOSE_FILE="${BASEDIR}/../docker-compose.yml"
+
+docker-compose -f ${DOCKER_COMPOSE_FILE} stop
+docker-compose -f ${DOCKER_COMPOSE_FILE} rm --force
+
+echo "Building/starting containers in 3 seconds...Ctrl+C to abort"
+
+sleep 3
+
+docker-compose -f ${DOCKER_COMPOSE_FILE} build
+
+docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --remove-orphans
+
+docker-compose -f ${DOCKER_COMPOSE_FILE} exec tap-tempo bash
