@@ -3,4 +3,3 @@ mock==2.0.0
 requests==2.20.0
 singer-python==5.0.15
 psutil==5.3.1
-target-stitch==1.8.1
