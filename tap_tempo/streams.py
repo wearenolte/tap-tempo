@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import singer
 from singer import metrics, utils, Transformer
@@ -61,7 +62,6 @@ class Accounts(Stream):
         if len(idx) > 0:
             last_updated_id = max(idx)
         Context.set_bookmark(updated_bookmark, last_updated_id)
-        singer.utils
         singer.write_state(Context.state)
 
 
@@ -70,20 +70,23 @@ class Plans(Stream):
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
         last_updated = Context.get_start_date_bookmark(updated_bookmark)
-        print(last_updated.date())
-        # pager = Paginator(client=Context.client, next_page_url=self.path)
-        # params = {
-        #     'from': '2019-06-01',
-        #     'to': '2019-07-22'
-        # }
-        # for page in pager.pages(tap_stream_id=self.tap_stream_id, params=params):
-        #     print(len(page['results']))
+        params = {
+            "from": Context.config["start_date"],
+            "to": str(date.today()),
+            "updateFrom": last_updated
+        }
+        pager = Paginator(client=Context.client, next_page_url=self.path)
+        for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET", params=params):
+            self.write_page(page)
+
+        Context.set_bookmark(updated_bookmark, str(date.today()))
+        singer.write_state(Context.state)
 
 
 ACCOUNTS = Accounts('accounts', ['id'], path='accounts/')
 PLANS = Plans('plans', ['id'], path='plans/')
 
 ALL_STREAMS = [
-    ACCOUNTS,
-    #PLANS,
+    #ACCOUNTS,
+    PLANS,
 ]
