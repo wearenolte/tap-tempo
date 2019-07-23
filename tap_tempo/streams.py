@@ -54,7 +54,6 @@ class StatefulStreamId(Stream):
             page = [rec for rec in page if rec["id"] > last_updated_id]
             idx += [rec["id"] for rec in page]
             self.write_page(page)
-            break
 
         if len(idx) > 0:
             last_updated_id = max(idx)
@@ -77,7 +76,7 @@ class StatefulStreamDate(Stream):
         pager = Paginator(client=Context.client, next_page_url=self.path)
         for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET", params=params):
             self.write_page(page)
-            break
+
         Context.set_bookmark(updated_bookmark, str(date.today()))
         singer.write_state(Context.state)
 
