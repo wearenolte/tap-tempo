@@ -15,7 +15,6 @@ class Stream:
     Important class properties:
     :var tap_stream_id:
     :var pk_fields: A list of primary key fields
-    :var indirect_stream: If True, this indicates the stream cannot be synced
     directly, but instead has its data generated via a separate stream."""
 
     def __init__(self, tap_stream_id, pk_fields,page_limit=None, path=None):
