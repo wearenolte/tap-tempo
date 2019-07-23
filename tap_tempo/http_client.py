@@ -36,12 +36,6 @@ class Client:
         self.redirect_uri = config.get('redirect_uri')
         self.config_path = config.get('config_path')
 
-        # Auth token lasts 60 days.
-        # Refreshing token every first day of the month would suffice.
-        if datetime.today().day == 1:
-            self.refresh_credentials()
-            self.test_credentials_are_authorized()
-
     def _headers(self, headers):
         headers = headers.copy()
         if self.user_agent:
@@ -83,28 +77,20 @@ class Client:
         response.raise_for_status()
         return response.json()
 
-    def refresh_credentials(self):
-        # Refresh access token and write new token on config file
-        body = {
-            "grant_type": "refresh_token",
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "refresh_token": self.refresh_token,
-            "redirect_uri": self.redirect_uri,
-        }
-        try:
-            resp = self.session.post("https://api.tempo.io/oauth/token", data=body)
-            resp.raise_for_status()
-            self.access_token = resp.json()['access_token']
-            # Update config file
-            with open(self.config_path, 'r+') as f:
-                data = json.load(f)
-                data['access_token'] = self.access_token
-                f.seek(0)
-                json.dump(data, f, indent=2)
-                f.truncate()
-        except Exception as e:
-            error_message = str(e)
-            if resp:
-                error_message = error_message + ", Response from Tempo: {}".format(resp.text)
-            raise Exception(error_message) from e
+
+class Paginator:
+    def __init__(self, client, next_page_url):
+        self.client = client
+        self.next_page_url = next_page_url
+
+    def pages(self, *args, **kwargs):
+        """Returns a generator which yields pages of data using "next" key in metadata.
+        :param args: Passed to Client.request
+        :param kwargs: Passed to Client.request
+        """
+        params = kwargs.pop("params", {}).copy()
+        while self.next_page_url is not None:
+            page = self.client.request(*args, path=self.next_page_url, params=params, **kwargs)
+            self.next_page_url = page['metadata'].get('next', None)
+            if page:
+                yield page['results']

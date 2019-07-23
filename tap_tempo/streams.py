@@ -1,8 +1,9 @@
 import json
 
 import singer
-from singer import metrics, utils, metadata, Transformer
+from singer import metrics, utils, Transformer
 from .context import Context
+from .http_client import Paginator
 
 
 BASE_URL = 'https://api.tempo.io/core/3/{}'
@@ -33,7 +34,7 @@ class Stream:
     def write_page(self, page):
         stream = Context.get_catalog_entry(self.tap_stream_id)
         extraction_time = singer.utils.now()
-        for rec in page['results']:
+        for rec in page:
             with Transformer() as transformer:
                 rec = transformer.transform(rec, stream.schema.to_dict())
             singer.write_record(self.tap_stream_id, rec, time_extracted=extraction_time)
@@ -41,8 +42,46 @@ class Stream:
             counter.increment(len(page))
 
 
-ACCOUNTS = Stream('accounts', ['id'], path='accounts/')
+class Accounts(Stream):
+    """
+    Keeps state through last added id
+    """
+
+    def sync(self):
+        updated_bookmark = [self.tap_stream_id, "updated"]
+        last_updated_id = Context.update_id_bookmark(updated_bookmark)
+        idx = []
+        pager = Paginator(client=Context.client, next_page_url=self.path)
+        for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET"):
+            page = [rec for rec in page if rec["id"] > last_updated_id]
+            idx += [rec["id"] for rec in page]
+            self.write_page(page)
+
+        if len(idx) > 0:
+            last_updated_id = max(idx)
+        Context.set_bookmark(updated_bookmark, last_updated_id)
+        singer.write_state(Context.state)
+
+
+class Plans(Stream):
+
+    def sync(self):
+        updated_bookmark = [self.tap_stream_id, "updated"]
+        last_updated = Context.update_start_date_bookmark(updated_bookmark)
+        print(last_updated.date())
+        # pager = Paginator(client=Context.client, next_page_url=self.path)
+        # params = {
+        #     'from': '2019-06-01',
+        #     'to': '2019-07-22'
+        # }
+        # for page in pager.pages(tap_stream_id=self.tap_stream_id, params=params):
+        #     print(len(page['results']))
+
+
+ACCOUNTS = Accounts('accounts', ['id'], path='accounts/')
+PLANS = Plans('plans', ['id'], path='plans/')
 
 ALL_STREAMS = [
-    ACCOUNTS,
+    #ACCOUNTS,
+    PLANS,
 ]
