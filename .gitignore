@@ -106,5 +106,5 @@ venv.bak/
 # pycharm
 .idea
 
-tap-config.json
-target-config.json
+tap_config.json
+target_config.json

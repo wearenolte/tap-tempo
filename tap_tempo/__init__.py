@@ -64,5 +64,4 @@ if __name__ == "__main__":
     Context.state = args.state
     Context.client = Client(Context.config)
     sync()
-    print(Context.state)
     # print(json.dumps(page['results'][0], indent=2))

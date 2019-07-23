@@ -10,7 +10,7 @@ BASE_URL = 'https://api.tempo.io/core/3/{}'
 
 
 class Stream:
-    """Information about and functions for syncing streams for the Jira API.
+    """Information about and functions for syncing streams for the Tempo API.
     Important class properties:
     :var tap_stream_id:
     :var pk_fields: A list of primary key fields
@@ -49,7 +49,7 @@ class Accounts(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
-        last_updated_id = Context.get_id_bookmark(updated_bookmark)
+        last_updated_id = int(Context.get_id_bookmark(updated_bookmark))
         print(last_updated_id)
         idx = []
         pager = Paginator(client=Context.client, next_page_url=self.path)
@@ -61,6 +61,7 @@ class Accounts(Stream):
         if len(idx) > 0:
             last_updated_id = max(idx)
         Context.set_bookmark(updated_bookmark, last_updated_id)
+        singer.utils
         singer.write_state(Context.state)
 
 
