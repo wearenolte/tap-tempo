@@ -17,12 +17,6 @@ class Context:
         return cls.stream_map[stream_name]
 
     @classmethod
-    def is_selected(cls, stream_name):
-        stream = cls.get_catalog_entry(stream_name)
-        stream_metadata = metadata.to_map(stream.metadata)
-        return metadata.get(stream_metadata, (), 'selected')
-
-    @classmethod
     def bookmarks(cls):
         if "bookmarks" not in cls.state:
             cls.state["bookmarks"] = {}
@@ -44,7 +38,7 @@ class Context:
         cls.bookmark(path[:-1])[path[-1]] = val
 
     @classmethod
-    def update_start_date_bookmark(cls, path):
+    def get_start_date_bookmark(cls, path):
         val = cls.bookmark(path)
         if not val:
             val = cls.config["start_date"]
@@ -55,7 +49,8 @@ class Context:
         return val
 
     @classmethod
-    def retrieve_timezone(cls):
-        response = cls.client.send("GET", "/rest/api/2/myself")
-        response.raise_for_status()
-        return response.json()["timeZone"]
+    def get_id_bookmark(cls, path):
+        val = cls.bookmark(path)
+        if not val:
+            return -1
+        return val

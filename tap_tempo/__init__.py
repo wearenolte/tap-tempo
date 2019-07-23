@@ -6,7 +6,7 @@ from singer import utils
 from singer.catalog import Catalog, CatalogEntry, Schema
 
 from . import streams as streams_
-from .http_client import Client
+from .http_client import Client, Paginator
 from .context import Context
 
 
@@ -14,6 +14,8 @@ REQUIRED_CONFIG_KEYS = ["start_date",
                         "user_agent",
                         "access_token",
                         ]
+
+LOGGER = singer.get_logger()
 
 
 def get_abs_path(path):
@@ -36,9 +38,6 @@ def discover():
 def load_schema(tap_stream_id):
     path = "schemas/{}.json".format(tap_stream_id)
     schema = utils.load_json(get_abs_path(path))
-    # refs = schema.pop("definitions", {})
-    # if refs:
-    #     singer.resolve_schema_references(schema, refs)
     return schema
 
 
@@ -59,10 +58,23 @@ def sync():
         stream.sync()
 
 
-if __name__ == "__main__":
+def main_impl():
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
     catalog = discover()
     Context.config = args.config
     Context.catalog = catalog
+    Context.state = args.state
     Context.client = Client(Context.config)
     sync()
+
+
+def main():
+    try:
+        main_impl()
+    except Exception as exc:
+        LOGGER.critical(exc)
+        raise exc
+
+
+if __name__ == "__main__":
+    main()
