@@ -18,12 +18,12 @@ class Stream:
     :var indirect_stream: If True, this indicates the stream cannot be synced
     directly, but instead has its data generated via a separate stream."""
 
-    def __init__(self, tap_stream_id, pk_fields, indirect_stream=False, path=None):
+    def __init__(self, tap_stream_id, pk_fields,page_limit=None, path=None):
         self.tap_stream_id = tap_stream_id
         self.pk_fields = pk_fields
         # Only used to skip streams in the main sync function
-        self.indirect_stream = indirect_stream
         self.path = BASE_URL.format(path)
+        self.page_limit = page_limit
 
     def __repr__(self):
         return "<Stream(" + self.tap_stream_id + ")>"
@@ -43,10 +43,7 @@ class Stream:
             counter.increment(len(page))
 
 
-class Accounts(Stream):
-    """
-    Keeps state through last added id
-    """
+class StatefulStreamId(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
@@ -58,6 +55,7 @@ class Accounts(Stream):
             page = [rec for rec in page if rec["id"] > last_updated_id]
             idx += [rec["id"] for rec in page]
             self.write_page(page)
+            break
 
         if len(idx) > 0:
             last_updated_id = max(idx)
@@ -65,7 +63,7 @@ class Accounts(Stream):
         singer.write_state(Context.state)
 
 
-class Plans(Stream):
+class StatefulStreamDate(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
@@ -73,20 +71,24 @@ class Plans(Stream):
         params = {
             "from": Context.config["start_date"],
             "to": str(date.today()),
-            "updateFrom": last_updated
+            "updateFrom": last_updated,
         }
+        if self.page_limit:
+            params['limit'] = self.page_limit
         pager = Paginator(client=Context.client, next_page_url=self.path)
         for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET", params=params):
             self.write_page(page)
-
+            break
         Context.set_bookmark(updated_bookmark, str(date.today()))
         singer.write_state(Context.state)
 
 
-ACCOUNTS = Accounts('accounts', ['id'], path='accounts/')
-PLANS = Plans('plans', ['id'], path='plans/')
+ACCOUNTS = StatefulStreamId("accounts", ["id"], path="accounts/")
+PLANS = StatefulStreamDate("plans", ["id"], path="plans/", page_limit=500)
+WORKLOGS = StatefulStreamDate("worklogs", ["tempoWorklogId"], path="worklogs/", page_limit=500)
 
 ALL_STREAMS = [
-    #ACCOUNTS,
+    ACCOUNTS,
     PLANS,
+    WORKLOGS,
 ]

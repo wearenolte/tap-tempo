@@ -1,0 +1,152 @@
+{
+  "type": [
+    "null",
+    "object"
+  ],
+  "properties": {
+    "self": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "tempoWorklogId": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "jiraWorklogId": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "issue": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "properties": {
+        "self": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "key": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "timeSpentSeconds": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "startDate": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date"
+    },
+    "startTime": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "time"
+    },
+    "description": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "createdAt": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "author": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "properties": {
+        "self": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "accountId": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "displayName": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "attributes": {
+      "type": [
+        "null",
+        "object"
+      ]
+    },
+    "properties": {
+      "self": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "values": {
+        "type": [
+          "null",
+          "array"
+        ],
+        "items":{
+          "type": [
+            "null",
+            "object"
+          ],
+          "properties": {
+            "key": {
+              "type": [
+                "null",
+                "string"
+              ]
+            },
+            "value": {
+              "type": [
+                "null",
+                "any"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

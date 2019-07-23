@@ -15,6 +15,8 @@ REQUIRED_CONFIG_KEYS = ["start_date",
                         "access_token",
                         ]
 
+LOGGER = singer.get_logger()
+
 
 def get_abs_path(path):
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
@@ -56,7 +58,7 @@ def sync():
         stream.sync()
 
 
-if __name__ == "__main__":
+def main_impl():
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
     catalog = discover()
     Context.config = args.config
@@ -64,4 +66,15 @@ if __name__ == "__main__":
     Context.state = args.state
     Context.client = Client(Context.config)
     sync()
-    # print(json.dumps(page['results'][0], indent=2))
+
+
+def main():
+    try:
+        main_impl()
+    except Exception as exc:
+        LOGGER.critical(exc)
+        raise exc
+
+
+if __name__ == "__main__":
+    main()
