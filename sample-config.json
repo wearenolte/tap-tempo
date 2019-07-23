@@ -1,8 +1,5 @@
 {
   "access_token": "<access-token>",
-  "refresh_token": "<refresh-token>",
-  "client_id": "<client_id>",
-  "client_secret": "<client_secret>",
   "start_date": "<i.e. 2017-12-04T19:19:32Z>",
   "user_agent": "<user-agent>"
 }

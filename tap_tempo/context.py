@@ -38,7 +38,7 @@ class Context:
         cls.bookmark(path[:-1])[path[-1]] = val
 
     @classmethod
-    def update_start_date_bookmark(cls, path):
+    def get_start_date_bookmark(cls, path):
         val = cls.bookmark(path)
         if not val:
             val = cls.config["start_date"]
@@ -49,7 +49,7 @@ class Context:
         return val
 
     @classmethod
-    def update_id_bookmark(cls, path):
+    def get_id_bookmark(cls, path):
         val = cls.bookmark(path)
         if not val:
             return -1

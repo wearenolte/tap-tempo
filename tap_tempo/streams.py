@@ -49,7 +49,8 @@ class Accounts(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
-        last_updated_id = Context.update_id_bookmark(updated_bookmark)
+        last_updated_id = Context.get_id_bookmark(updated_bookmark)
+        print(last_updated_id)
         idx = []
         pager = Paginator(client=Context.client, next_page_url=self.path)
         for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET"):
@@ -67,7 +68,7 @@ class Plans(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
-        last_updated = Context.update_start_date_bookmark(updated_bookmark)
+        last_updated = Context.get_start_date_bookmark(updated_bookmark)
         print(last_updated.date())
         # pager = Paginator(client=Context.client, next_page_url=self.path)
         # params = {
@@ -82,6 +83,6 @@ ACCOUNTS = Accounts('accounts', ['id'], path='accounts/')
 PLANS = Plans('plans', ['id'], path='plans/')
 
 ALL_STREAMS = [
-    #ACCOUNTS,
-    PLANS,
+    ACCOUNTS,
+    #PLANS,
 ]
