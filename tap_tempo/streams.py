@@ -70,5 +70,5 @@ WORKLOGS = StatefulStream("worklogs", ["tempoWorklogId"], path="worklogs/", page
 ALL_STREAMS = [
     ACCOUNTS,
     PLANS,
-    #WORKLOGS,
+    WORKLOGS,
 ]
