@@ -51,7 +51,7 @@ class StatefulStream(Stream):
         params = {
             "from": Context.config["start_date"],
             "to": str(date.today()),
-            "updateFrom": last_updated,
+            "updatedFrom": last_updated,
         }
         if self.page_limit:
             params['limit'] = self.page_limit
@@ -70,5 +70,5 @@ WORKLOGS = StatefulStream("worklogs", ["tempoWorklogId"], path="worklogs/", page
 ALL_STREAMS = [
     ACCOUNTS,
     PLANS,
-    WORKLOGS,
+    #WORKLOGS,
 ]

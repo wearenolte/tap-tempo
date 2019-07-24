@@ -42,10 +42,7 @@ class Context:
         val = cls.bookmark(path)
         if not val:
             val = cls.config["start_date"]
-            val = utils.strptime_to_utc(val)
             cls.set_bookmark(path, val)
-        if isinstance(val, str):
-            val = utils.strptime_to_utc(val)
         return val
 
     @classmethod

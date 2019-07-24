@@ -94,3 +94,4 @@ class Paginator:
             self.next_page_url = page['metadata'].get('next', None)
             if page:
                 yield page['results']
+
