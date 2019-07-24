@@ -44,10 +44,3 @@ class Context:
             val = cls.config["start_date"]
             cls.set_bookmark(path, val)
         return val
-
-    @classmethod
-    def get_id_bookmark(cls, path):
-        val = cls.bookmark(path)
-        if not val:
-            return -1
-        return val
