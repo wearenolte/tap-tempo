@@ -108,3 +108,4 @@ venv.bak/
 
 tap_config.json
 target_config.json
+state.json
