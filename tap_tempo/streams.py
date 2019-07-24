@@ -28,8 +28,9 @@ class Stream:
         return "<Stream(" + self.tap_stream_id + ")>"
 
     def sync(self):
-        page = Context.client.request(tap_stream_id=self.tap_stream_id, method="GET", path=self.path)
-        self.write_page(page)
+        pager = Paginator(client=Context.client, next_page_url=self.path)
+        for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET"):
+            self.write_page(page)
 
     def write_page(self, page):
         stream = Context.get_catalog_entry(self.tap_stream_id)
@@ -42,26 +43,7 @@ class Stream:
             counter.increment(len(page))
 
 
-class StatefulStreamId(Stream):
-
-    def sync(self):
-        updated_bookmark = [self.tap_stream_id, "updated"]
-        last_updated_id = int(Context.get_id_bookmark(updated_bookmark))
-        print(last_updated_id)
-        idx = []
-        pager = Paginator(client=Context.client, next_page_url=self.path)
-        for page in pager.pages(tap_stream_id=self.tap_stream_id, method="GET"):
-            page = [rec for rec in page if rec["id"] > last_updated_id]
-            idx += [rec["id"] for rec in page]
-            self.write_page(page)
-
-        if len(idx) > 0:
-            last_updated_id = max(idx)
-        Context.set_bookmark(updated_bookmark, last_updated_id)
-        singer.write_state(Context.state)
-
-
-class StatefulStreamDate(Stream):
+class StatefulStream(Stream):
 
     def sync(self):
         updated_bookmark = [self.tap_stream_id, "updated"]
@@ -81,9 +63,9 @@ class StatefulStreamDate(Stream):
         singer.write_state(Context.state)
 
 
-ACCOUNTS = StatefulStreamId("accounts", ["id"], path="accounts/")
-PLANS = StatefulStreamDate("plans", ["id"], path="plans/", page_limit=500)
-WORKLOGS = StatefulStreamDate("worklogs", ["tempoWorklogId"], path="worklogs/", page_limit=500)
+ACCOUNTS = Stream("accounts", ["id"], path="accounts/")
+PLANS = StatefulStream("plans", ["id"], path="plans/", page_limit=500)
+WORKLOGS = StatefulStream("worklogs", ["tempoWorklogId"], path="worklogs/", page_limit=500)
 
 ALL_STREAMS = [
     ACCOUNTS,
