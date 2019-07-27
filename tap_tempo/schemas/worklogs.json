@@ -48,6 +48,12 @@
         "number"
       ]
     },
+    "billableSeconds": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
     "startDate": {
       "type": [
         "null",
