@@ -50,7 +50,7 @@ class StatefulStream(Stream):
         last_updated = Context.get_start_date_bookmark(updated_bookmark)
         params = {
             "from": Context.config["start_date"],
-            "to": str(date.today() + timedelta(days=250)),
+            "to": str(date.today() + timedelta(days=750)),
             "updatedFrom": last_updated,
         }
         if self.page_limit:
