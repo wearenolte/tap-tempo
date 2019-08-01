@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, timedelta
 
 import singer
 from singer import metrics, utils, Transformer
@@ -50,7 +50,7 @@ class StatefulStream(Stream):
         last_updated = Context.get_start_date_bookmark(updated_bookmark)
         params = {
             "from": Context.config["start_date"],
-            "to": str(date.today()),
+            "to": str(date.today() + timedelta(days=250)),
             "updatedFrom": last_updated,
         }
         if self.page_limit:
